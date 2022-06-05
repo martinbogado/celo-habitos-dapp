@@ -7,7 +7,8 @@ import {
   GreeterContract, 
   AccountInfo, 
   Polling, 
-  MessengerContract 
+  MessengerContract,
+  HabitosContract 
 } from "@/components";
 
 import AppLayout from "@/components/layout/AppLayout";
@@ -39,7 +40,8 @@ export default function App() {
             <Tab label="Account" {...a11yProps(0)} />
             <Tab label="Storage" {...a11yProps(1)} />
             <Tab label="Greeter" {...a11yProps(2)} />
-            <Tab label="Messenger Contract" {...a11yProps(2)} />
+            <Tab label="Messenger Contract" {...a11yProps(3)} />
+            <Tab label="Habitos App" {...a11yProps(4)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -53,6 +55,9 @@ export default function App() {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <MessengerContract contractData={contracts?.Messenger} />
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <HabitosContract contractData={contracts?.Habitos} />
         </TabPanel>
       </Box>
       <Polling/>

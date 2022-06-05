@@ -88,10 +88,10 @@ export function StorageContract({ contractData }) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   // Query the Graph endpoint specified in ../apollo-client.js 
-  const { data: queryData, error: queryError } = useQuery(QUERY, {
-    pollInterval: 2500,
-  });
-  console.log('The Graph query results', queryData);
+  // const { data: queryData, error: queryError } = useQuery(QUERY, {
+  //   pollInterval: 2500,
+  // });
+  // console.log('The Graph query results', queryData);
 
   const contract = contractData
     ? (new kit.web3.eth.Contract(
@@ -192,9 +192,7 @@ export function StorageContract({ contractData }) {
           Read Storage Contract
         </Button>
       </Grid>
-      <Grid item sm={6} xs={12} sx={{ m: 2 }}>
-        {queryData && <StorageEventTable network={network} rows={queryData.updates}></StorageEventTable>}
-      </Grid>
+
     </Grid>
   );
 }
