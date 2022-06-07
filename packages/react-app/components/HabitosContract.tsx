@@ -11,33 +11,59 @@ import {useQuery, useMutation, gql} from "@apollo/client"
 
 import { Habitos } from "@celo-progressive-dapp-starter/hardhat/types/Habitos";
 
-export function HabitosContract({ contractData }) {
-    
-    // GraphQL Query String
-    const QUERY_STRING = gql`{
-        habits {
-        id
-        habit
-        count
+// GraphQL Query String
+const QUERY_STRING = gql`
+    query ChallengeInfo($user: String!) {
+        challenges(where: {address: {_eq: $user}}) {
+          streak
+          address
+          habits {
+            habit
+            description
+          }
         }
     }`
 
-    const MUTATION_STRING = gql`mutation add_habit ($objects: [habits_insert_input!]!){
-        insert_habits(objects: $objects){
-          affected_rows
+const ADD_CHALLENGE = gql`
+    mutation AddNewChallenge($challenge: [challenges_insert_input!]!, $addhabits: [habits_insert_input!]!) {
+        insert_challenges(objects: $challenge) {
+            affected_rows
+        },
+        insert_habits(objects: $addhabits) {
+            affected_rows
         }
-      }`
+    }`
 
+
+export function HabitosContract({ contractData }) {
+    
+    const { kit, address, network, performActions } = useContractKit();
+
+    console.log(address)
     // run query using the useQuery Hook
     // refetch is a function to repeat the request when needed
-    const {data, loading, refetch, error} = useQuery(QUERY_STRING);
+    const {data, loading, refetch, error} = useQuery(QUERY_STRING,{
+        variables: { user: address },
+      });
     console.log('The Graph query results', data);
  
     // create function to run mutation
-    const [add_habit, response] = useMutation(MUTATION_STRING)
+    const [add_challenge, response] = useMutation(ADD_CHALLENGE)
 
     // state to hold form data
-    const [form, setForm] = useState({habit: "", count: 0})
+    const [form, setForm] = useState({habit: "", count: 0});
+
+    const habit1 = {
+        user: address,
+        habit: 'Jugar Pelota',
+        description: 'Nose'
+    }
+
+    const habit2 = {
+        user: address,
+        habit: 'Jugar Volley',
+        description: 'Nose'
+    }
 
     // handleChange function for form
     const handleChange = (e) => setForm({...form, [e.target.name]: e.target.value});
@@ -47,7 +73,12 @@ export function HabitosContract({ contractData }) {
         // prevent refresh
         e.preventDefault();
         // add habit, pass in variables
-        await add_habit({variables: {objects: [form]}});
+        await add_challenge({
+            variables: {
+                challenge: [{address: address}], 
+                addhabits: [habit1, habit2]
+            }
+        });
         // refetch query to get new data
         refetch();
     }
@@ -58,8 +89,22 @@ export function HabitosContract({ contractData }) {
     }
 
     // return value if the request errors
-    if (error){
-    return <h1>There is an Error</h1>
+    if (error){  
+        return(
+            <>
+             { error.message == 'unexpected null value for type "String"' ?
+             <>
+              <h1>Please connect your wallet</h1>
+             </>
+           
+            :
+            <div>
+              <h1>There is an Error</h1>
+              <div>{error.message}</div>
+            </div>
+            }
+            </>   
+        ) 
     }
 
     // return value if the request is pending
@@ -75,7 +120,20 @@ export function HabitosContract({ contractData }) {
             <input type="number" name="count" value={form.count} onChange={handleChange}/>
             <input type="submit" value="track habit"/>
         </form>
-        {data.habits.map(h => <h1 key={h.id}>{h.habit} {h.count}</h1>)}
+        <div>{data.challenges[0]?.streak}</div>
+        {data.challenges[0] ? 
+            data.challenges[0].habits?.map( habit => {
+                return(
+                  <>
+                    <h3>{habit.habit}</h3>
+                    <p>{habit.description}</p>
+                  </>
+                )
+            })
+          :
+          'Sin Retos'  
+        }
+        
     </div>
     }
 }
