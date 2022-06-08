@@ -15,7 +15,7 @@ const NuevoReto = () => {
     const handleClose = () => setOpen(false);
 
     return(
-        <div className={style.container}>
+        <div>
             <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleOpen}>
               Comenzar nuevo reto
             </Button>
