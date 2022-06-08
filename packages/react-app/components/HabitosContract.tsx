@@ -12,8 +12,12 @@ import {useQuery, useMutation, gql} from "@apollo/client"
 import { Habitos } from "@celo-progressive-dapp-starter/hardhat/types/Habitos";
 
 import style from './habits/HabitContract.module.scss';
+import { RiEmotionSadLine } from 'react-icons/ri';
+import { TbPlugConnected } from 'react-icons/tb';
+
 import NuevoReto from "./habits/NuevoReto/NuevoReto";
 import Habit from "./habits/Habit/Habit";
+import HabitHeader from "./habits/Header/HabitHeader";
 
 // GraphQL Query String
 const QUERY_STRING = gql`
@@ -61,12 +65,14 @@ export function HabitosContract({ contractData }) {
     const habit1 = {
         user: address,
         habit: 'Jugar Pelota',
+        img: '',
         description: 'Nose'
     }
 
     const habit2 = {
         user: address,
         habit: 'Jugar Volley',
+        img: '',
         description: 'Nose'
     }
 
@@ -96,36 +102,49 @@ export function HabitosContract({ contractData }) {
     // return value if the request errors
     if (error){  
         return(
-            <>
+            <div className={style.container}>
+                <HabitHeader streak={null} loading={true} />
              { error.message == 'unexpected null value for type "String"' ?
-             <>
-              <h1>Please connect your wallet</h1>
-             </>
+                <div className={style.connectWallet}>
+                    <TbPlugConnected />
+                    <p>Please connect your wallet</p>
+                </div>
            
             :
-            <div>
-              <h1>There is an Error</h1>
-              <div>{error.message}</div>
-            </div>
+                <div>
+                    <div>
+                        <RiEmotionSadLine />
+                        <h1>There is an Error</h1>
+                    </div>
+                    <div>{error.message}</div>
+                </div>
             }
-            </>   
+            </div>   
         ) 
     }
 
     // return value if the request is pending
     if (loading) {
-    return <h1>The Data is Loading</h1>
-    }
+    return(
+        <div className={style.container}>
+            <HabitHeader streak={null} loading={true} />
+            <div className={style.loading}>
+                <p>The Data is Loading</p>
+                <img src="/images/loading.gif" alt="Loading" />
+            </div>   
+        </div>
+    )}
 
     // return value if the request is completed
     if (data){
     return <div className={style.container}>
-        <form onSubmit={handleSubmit}>
+        {/* <form onSubmit={handleSubmit}>
             <input type="text" name="habit" value={form.habit} onChange={handleChange}/>
             <input type="number" name="count" value={form.count} onChange={handleChange}/>
             <input type="submit" value="track habit"/>
-        </form>
-        <div>{data.challenges[0]?.streak}</div>
+        </form> */}
+        <HabitHeader streak={data.challenges[0]?.streak} loading={false} />
+       
         {data.challenges[0] ? 
             data.challenges[0].habits?.map( h => {
                 return(
@@ -138,7 +157,11 @@ export function HabitosContract({ contractData }) {
               <NuevoReto />
           </div> 
         }
-        
+        {data.challenges[0] && (
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained">
+                Completar Dia
+            </Button>
+        )}
     </div>
     }
 }
