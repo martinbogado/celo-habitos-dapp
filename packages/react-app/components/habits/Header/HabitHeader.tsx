@@ -1,9 +1,11 @@
 import React from 'react';
 import { BsLightningCharge, BsTrophy, BsJournalBookmark } from 'react-icons/bs';
+import { FiUserX } from 'react-icons/fi';
 import { Divider } from '@mui/material';
 import style from './HabitHeader.module.scss';
+import { truncateAddress } from '@/utils';
 
-const HabitHeader = ({ streak, loading }) => {
+const HabitHeader = ({ streak, loading, address }) => {
 
   return (
     <div className={style.container}>
@@ -22,10 +24,24 @@ const HabitHeader = ({ streak, loading }) => {
         } 
       </div>
       <div className={style.completed}>
-        <BsTrophy />
-        All habits completed
+        {
+          address ? 
+          <>
+            <BsTrophy />
+            Todos los habitos completados
+          </>
+          :
+          <>
+           <FiUserX />
+           No hay ningún usuario conectado
+          </>
+        }
+        
       </div>
       <Divider sx={{ m: 1 }} />
+      <div className={style.address}>
+      {address && <span >Estas logeado con la address <strong>{truncateAddress(address)}</strong></span>}
+      </div>
     </div>
   )
 }

@@ -96,25 +96,25 @@ export function HabitosContract({ contractData }) {
 
     // check if mutation failed
     if(response.error){
-    <h1>Failed to Add Habit</h1>
+    <h1>Error al agregar un nuevo reto</h1>
     }
 
     // return value if the request errors
     if (error){  
         return(
             <div className={style.container}>
-                <HabitHeader streak={null} loading={true} />
+                <HabitHeader streak={null} loading={true} address={address} />
              { error.message == 'unexpected null value for type "String"' ?
                 <div className={style.connectWallet}>
                     <TbPlugConnected />
-                    <p>Please connect your wallet</p>
+                    <p>Por favor conecta tu Wallet</p>
                 </div>
            
             :
                 <div>
-                    <div>
+                    <div className={style.connectWallet}>
                         <RiEmotionSadLine />
-                        <h1>There is an Error</h1>
+                        <p>A ocurrido un error</p>
                     </div>
                     <div>{error.message}</div>
                 </div>
@@ -127,9 +127,9 @@ export function HabitosContract({ contractData }) {
     if (loading) {
     return(
         <div className={style.container}>
-            <HabitHeader streak={null} loading={true} />
+            <HabitHeader streak={null} loading={true} address={address}/>
             <div className={style.loading}>
-                <p>The Data is Loading</p>
+                <p>La información esta cargando</p>
                 <img src="/images/loading.gif" alt="Loading" />
             </div>   
         </div>
@@ -143,7 +143,7 @@ export function HabitosContract({ contractData }) {
             <input type="number" name="count" value={form.count} onChange={handleChange}/>
             <input type="submit" value="track habit"/>
         </form> */}
-        <HabitHeader streak={data.challenges[0]?.streak} loading={false} />
+        <HabitHeader streak={data.challenges[0]?.streak} loading={false} address={address}/>
        
         {data.challenges[0] ? 
             data.challenges[0].habits?.map( h => {
@@ -153,7 +153,9 @@ export function HabitosContract({ contractData }) {
             })
           :
           <div>
-              <button>Comenzar nuevo reto</button>
+              <Button sx={{ m: 1, marginTop: 4 }} variant="contained">
+                Comenzar nuevo reto
+              </Button>
               <NuevoReto />
           </div> 
         }
