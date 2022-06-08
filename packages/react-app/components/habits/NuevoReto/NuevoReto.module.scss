@@ -1,12 +1,45 @@
+.container {
 
-
-.card {
-    display: flex;
-    align-items: center;
-    margin: 1rem;
-
-    img {
-        max-height: 48px;
-        margin-right: 16px;
-    }
 }
+
+.list{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: rgb(240, 240, 240);
+    border-radius: 12px;
+    width: 40%;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .close {
+        align-self: flex-end;
+    }
+
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+
+    ::-webkit-scrollbar {
+    width: 3px;
+    height: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+    background: #dddddd;
+    }
+
+    ::-webkit-scrollbar-thumb {
+    background: #888888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+    } 
+}
+

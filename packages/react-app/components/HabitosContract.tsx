@@ -152,12 +152,7 @@ export function HabitosContract({ contractData }) {
                 )
             })
           :
-          <div>
-              <Button sx={{ m: 1, marginTop: 4 }} variant="contained">
-                Comenzar nuevo reto
-              </Button>
-              <NuevoReto />
-          </div> 
+            <NuevoReto /> 
         }
         {data.challenges[0] && (
             <Button sx={{ m: 1, marginTop: 4 }} variant="contained">
