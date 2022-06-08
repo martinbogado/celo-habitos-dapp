@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/Habitos.sol": {
+      "content": "// SPDX-License-Identifier: GLP-3.0\r\n\r\n// Version para un solo Usuario\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\ncontract Habitos {\r\n\r\n    address author;\r\n    enum State {Empezado, Finalizado}\r\n    enum CumplioReto {NoSupero, Supero}\r\n    enum CobroPremio {NoCobrado, Cobrado}\r\n    uint montoReto = 1000000000000000000; //monto para ingresar al reto de 1 Celo (o Eth)\r\n    uint public totalRetos = 0;\r\n\r\n    mapping (address => uint[]) retosPorUser;\r\n    \r\n    constructor() {\r\n        author = msg.sender;\r\n    }\r\n\r\n   struct User {\r\n        address wallet;\r\n        CumplioReto cumplioReto;\r\n        CobroPremio cobroPremio;\r\n        bool[3] dias;\r\n    }\r\n    \r\n    struct Reto {\r\n        uint id;\r\n        string name;\r\n        User user;\r\n        uint deposito;\r\n        State estado;\r\n        uint fechaComienzo;\r\n    }\r\n\r\n    Reto[] public retos;\r\n\r\n    //evento crear nuevo reto\r\n    event RetoCreado(\r\n        uint id,\r\n        address user1\r\n    );\r\n        \r\n    //Evento Notifica idReto y si es o no Ganador una finalizado los dias.\r\n    event NotificacionDeGanador(\r\n        uint indexReto,\r\n        CumplioReto resultado\r\n    );\r\n\r\n    event AnunciarPremioCobrado (uint indexReto, address wallet);\r\n\r\n    modifier onlyUser(uint indexReto) {\r\n        require(msg.sender == retos[indexReto].user.wallet, \"No es el Usuario del reto\");\r\n        _;\r\n    }\r\n\r\n    modifier onlyRetoEmpezado(uint indexReto) {\r\n        require(retos[indexReto].estado == State.Empezado, \"Este reto no esta en vigencia\");\r\n        _;\r\n    }\r\n\r\n    modifier onlyRetoFinalizado(uint indexReto) {\r\n        require(retos[indexReto].estado == State.Finalizado , \"El reto todavia no ha finalizado\");\r\n        _;\r\n    }\r\n\r\n    // Crear un reto por un Usuario\r\n    function crearReto(string memory _name) payable public {\r\n        require(msg.value == montoReto, \"El monto depositado no es el correcto, se requiere 1 Celo\");\r\n        Reto memory nuevoReto = Reto(\r\n            totalRetos,                  // id del reto\r\n            _name,                      // Nombre del reto\r\n            User(msg.sender, CumplioReto.NoSupero, CobroPremio.NoCobrado ,[false, false, false]),  //datos del User\r\n            msg.value,            // Cantidad de Eth\r\n            State.Empezado,        // Estado\r\n            block.timestamp        // Fecha de Comienzo\r\n            );\r\n        retos.push(nuevoReto);\r\n        emit RetoCreado(totalRetos, msg.sender);\r\n        retosPorUser[msg.sender].push(totalRetos);\r\n        totalRetos+=1;\r\n    }\r\n\r\n  // De prueba puse un reto cada minuto, durante 3 minutos.\r\n    function completarRetoDiario(uint indexReto) public onlyRetoEmpezado(indexReto) onlyUser(indexReto) {\r\n        uint dia = calcularDia(indexReto);\r\n        require(dia < 3, \"Ya termino el tiempo del reto de 3 dias\");\r\n        require(retos[indexReto].user.dias[dia] == false, \"Ya se cumplio el reto del dia de hoy\");\r\n        retos[indexReto].user.dias[dia] = true;  \r\n    }\r\n\r\n    function calcularDia(uint indexReto) internal onlyRetoEmpezado(indexReto) view returns(uint) {\r\n        uint diasTranscurridos = (block.timestamp - retos[indexReto].fechaComienzo) / (1 minutes);\r\n        return diasTranscurridos;\r\n    }\r\n\r\n    function finalizarReto(uint indexReto) public onlyUser(indexReto) onlyRetoEmpezado(indexReto) {\r\n        require(calcularDia(indexReto) > 2, \"Todavia no transcurrio el tiempo total\");\r\n        retos[indexReto].estado = State.Finalizado;\r\n        calcularGanador(indexReto);\r\n        if (retos[indexReto].user.cumplioReto == CumplioReto.NoSupero){\r\n            delRetoInactivoUser(indexReto);\r\n        }\r\n    }\r\n\r\n    function getRetosActivosPorUser() public view returns(uint[] memory){\r\n        return retosPorUser[msg.sender];\r\n    }\r\n\r\n    function delRetoInactivoUser(uint indexReto) internal {\r\n        uint[] storage arreglo = retosPorUser[msg.sender];\r\n        for (uint i=0; i < arreglo.length; i++) {\r\n            if (arreglo[i] == indexReto) {\r\n                arreglo[i] = arreglo[arreglo.length-1];\r\n                arreglo.pop();\r\n            }\r\n        }\r\n        retosPorUser[msg.sender] = arreglo;\r\n    }\r\n\r\n    function calcularGanador(uint indexReto) internal {\r\n        retos[indexReto].user.cumplioReto = CumplioReto.Supero;\r\n        for (uint i=0; i < 3; i++) {\r\n            if (!retos[indexReto].user.dias[i]) {\r\n                retos[indexReto].user.cumplioReto = CumplioReto.NoSupero;\r\n            }\r\n        }                  \r\n        emit NotificacionDeGanador(\r\n            indexReto,\r\n            retos[indexReto].user.cumplioReto\r\n            );\r\n    }\r\n\r\n  //Claimear premio\r\n    function reclamarPremio2(uint indexReto) public onlyUser(indexReto) onlyRetoFinalizado(indexReto) {\r\n        require (retos[indexReto].user.cumplioReto == CumplioReto.Supero, \"El reto no fue superado por este usuario\");\r\n        require (retos[indexReto].user.cobroPremio == CobroPremio.NoCobrado, \"Este premio ya fue cobrado por este usuario\");\r\n            payable(retos[indexReto].user.wallet).transfer(montoReto);\r\n            retos[indexReto].deposito -= montoReto;\r\n            retos[indexReto].user.cobroPremio = CobroPremio.Cobrado; // se marca cobrado al User\r\n            delRetoInactivoUser(indexReto);\r\n            emit AnunciarPremioCobrado(indexReto, msg.sender); // se anuncia premio cobrado por el User\r\n        }\r\n}"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

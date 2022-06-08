@@ -20,12 +20,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("Messenger", {
-    from: deployer,
-    args: ["Carpincho"],
-    log: true,
-  });
-
   await deploy("Habitos", {
     from: deployer,
     log: true,
@@ -70,4 +64,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
 };
 
-module.exports.tags = ["Greeter", "Storage", "Messenger", "Habitos"];
+module.exports.tags = ["Greeter", "Storage", "Habitos"];
