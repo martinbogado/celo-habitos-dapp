@@ -11,6 +11,10 @@ import {useQuery, useMutation, gql} from "@apollo/client"
 
 import { Habitos } from "@celo-progressive-dapp-starter/hardhat/types/Habitos";
 
+import style from './habits/HabitContract.module.scss';
+import NuevoReto from "./habits/NuevoReto/NuevoReto";
+import Habit from "./habits/Habit/Habit";
+
 // GraphQL Query String
 const QUERY_STRING = gql`
     query ChallengeInfo($user: String!) {
@@ -19,6 +23,7 @@ const QUERY_STRING = gql`
           address
           habits {
             habit
+            img
             description
           }
         }
@@ -114,7 +119,7 @@ export function HabitosContract({ contractData }) {
 
     // return value if the request is completed
     if (data){
-    return <div>
+    return <div className={style.container}>
         <form onSubmit={handleSubmit}>
             <input type="text" name="habit" value={form.habit} onChange={handleChange}/>
             <input type="number" name="count" value={form.count} onChange={handleChange}/>
@@ -122,16 +127,16 @@ export function HabitosContract({ contractData }) {
         </form>
         <div>{data.challenges[0]?.streak}</div>
         {data.challenges[0] ? 
-            data.challenges[0].habits?.map( habit => {
+            data.challenges[0].habits?.map( h => {
                 return(
-                  <>
-                    <h3>{habit.habit}</h3>
-                    <p>{habit.description}</p>
-                  </>
+                  <Habit img={h.img} habit={h.habit} description={h.description} />
                 )
             })
           :
-          'Sin Retos'  
+          <div>
+              <button>Comenzar nuevo reto</button>
+              <NuevoReto />
+          </div> 
         }
         
     </div>
