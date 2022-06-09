@@ -36,7 +36,7 @@ function MyApp({ Component, pageProps }: AppProps): React.ReactElement {
           <SnackbarProvider
             maxSnack={3}
             anchorOrigin={{
-              vertical: "bottom",
+              vertical: "top",
               horizontal: "right",
             }}
           >

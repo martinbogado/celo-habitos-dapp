@@ -9,7 +9,7 @@ import style from './NuevoReto.module.scss';
 import HabitsList from "../HabitsList/HabitsList";
 
 
-const NuevoReto = () => {
+const NuevoReto = ({ crearReto }) => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -28,7 +28,7 @@ const NuevoReto = () => {
                         X
                     </Button>
                     <HabitsList />
-                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained">
+                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={crearReto}>
                         Empezar nuevo reto
                     </Button>
                 </div>

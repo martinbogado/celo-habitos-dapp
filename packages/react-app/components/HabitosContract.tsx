@@ -1,11 +1,9 @@
 import * as React from "react";
 import { Box, Button, Divider, Grid, Typography, Link } from "@mui/material";
 
-import { useInput } from "@/hooks/useInput";
 import { useContractKit } from "@celo-tools/use-contractkit";
 import { useEffect, useState } from "react";
 import { SnackbarAction, SnackbarKey, useSnackbar } from "notistack";
-import { truncateAddress } from "@/utils";
 
 import {useQuery, useMutation, gql} from "@apollo/client"
 
@@ -47,14 +45,114 @@ const ADD_CHALLENGE = gql`
 export function HabitosContract({ contractData }) {
     
     const { kit, address, network, performActions } = useContractKit();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-    console.log(address)
-    // run query using the useQuery Hook
-    // refetch is a function to repeat the request when needed
+    const contract = contractData
+    ? (new kit.web3.eth.Contract(
+        contractData.abi,
+        contractData.address
+      ) as any as Habitos)
+    : null;
+    
+    const crearReto = async () => {
+        try {
+          await performActions(async (kit) => {
+            const { CELO } = await kit.getTotalBalance(address);
+ 
+            const oneGold = kit.connection.web3.utils.toWei('1', 'ether');
+
+            // const gasPrice = await contract.methods
+            //   .crearReto('nuevoReto')
+            //   .estimateGas();
+
+            // const tx = await kit.sendTransaction({
+            //   from: address,
+            //   to: contractData.address,
+            //   value: oneGold,
+            //   gasPrice: 1000000000,
+            // });
+
+            // const hash = await tx.getHash();
+            // const receipt = await tx.waitReceipt();
+          
+            const result = await contract.methods
+              .crearReto('nuevoReto' as string)
+              .send({ from: address, value: oneGold });
+
+            // const celo = await kit._web3Contracts.getGoldToken()
+            // const transaction= await celo.methods.transfer(contractData.address,kit.web3.utils.toWei('1', 'ether')).send({
+            //   "from": address
+            // })
+            // console.log(transaction);  
+    
+            console.log(result);
+    
+            const variant = result.status == true ? "success" : "error";
+           
+            const action: SnackbarAction = (key) => (
+              <>  
+                <Button
+                  onClick={() => {
+                    closeSnackbar(key);
+                  }}
+                >
+                  X
+                </Button>
+              </>
+            );
+            enqueueSnackbar("Nuevo Reto Creado", {
+              variant,
+              action,
+            });
+          });
+        } catch (e) {
+          enqueueSnackbar(e.message, {variant: 'error'});
+          console.log(e);
+        }
+      };
+
+      const actualizarStreak = async () => {
+        try {
+          await performActions(async (kit) => {
+            const gasLimit = await contract.methods
+              .completarRetoDiario(1)
+              .estimateGas();
+    
+            const result = await contract.methods
+              .completarRetoDiario(1)
+              //@ts-ignore
+              .send({ from: address, gasLimit });
+    
+            console.log(result);
+    
+            const variant = result.status == true ? "success" : "error";
+           
+            const action: SnackbarAction = (key) => (
+              <>    
+                <Button
+                  onClick={() => {
+                    closeSnackbar(key);
+                  }}
+                >
+                  X
+                </Button>
+              </>
+            );
+            enqueueSnackbar("Habitos del Dia Completados", {
+              variant,
+              action,
+            });
+          });
+        } catch (e) {
+          enqueueSnackbar(e.message, {variant: 'error'});
+          console.log(e);
+        }
+      };
+
     const {data, loading, refetch, error} = useQuery(QUERY_STRING,{
         variables: { user: address },
       });
-    console.log('The Graph query results', data);
+    // console.log('The Graph query results', data);
  
     // create function to run mutation
     const [add_challenge, response] = useMutation(ADD_CHALLENGE)
@@ -152,10 +250,16 @@ export function HabitosContract({ contractData }) {
                 )
             })
           :
-            <NuevoReto /> 
+            <>
+              <NuevoReto crearReto={crearReto} /> 
+              <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={crearReto}>
+                Empezar nuevo reto
+              </Button>
+            </>
+            
         }
         {data.challenges[0] && (
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained">
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={actualizarStreak}>
                 Completar Dia
             </Button>
         )}
