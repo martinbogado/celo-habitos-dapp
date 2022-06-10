@@ -1,0 +1,10 @@
+.card {
+    display: flex;
+    align-items: center;
+    margin: 1rem;
+
+    img {
+        max-height: 48px;
+        margin-right: 16px;
+    }
+}

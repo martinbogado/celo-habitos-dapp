@@ -1,85 +1,4 @@
 {
-  "4": {
-    "rinkeby": {
-      "name": "rinkeby",
-      "chainId": "4",
-      "contracts": {
-        "Greeter": {
-          "address": "0x971f1E92DdCf8EbaF9f2Ed83bfEe87e3E2816B81",
-          "abi": [
-            {
-              "inputs": [
-                {
-                  "internalType": "string",
-                  "name": "_greet",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "inputs": [],
-              "name": "greet",
-              "outputs": [
-                {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "string",
-                  "name": "_greeting",
-                  "type": "string"
-                }
-              ],
-              "name": "setGreeting",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            }
-          ]
-        },
-        "Storage": {
-          "address": "0x7Ae4DF8850b1a05b47F40a37EC8AA3374464644C",
-          "abi": [
-            {
-              "inputs": [],
-              "name": "retrieve",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "num",
-                  "type": "uint256"
-                }
-              ],
-              "name": "store",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            }
-          ]
-        }
-      }
-    }
-  },
   "1337": {
     "localhost": {
       "name": "localhost",
@@ -248,7 +167,7 @@
       "chainId": "44787",
       "contracts": {
         "Greeter": {
-          "address": "0xc7576A90cE35cb1614EdA509ee766Ea7377b5759",
+          "address": "0xB5a8ec273a0Fa41448D5777766d098b8568bf5dC",
           "abi": [
             {
               "inputs": [
@@ -308,8 +227,280 @@
             }
           ]
         },
+        "Habitos": {
+          "address": "0xbe2D414bd2d03f69b82EAf0b8505aF2b3D6AE34e",
+          "abi": [
+            {
+              "inputs": [],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "indexReto",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "wallet",
+                  "type": "address"
+                }
+              ],
+              "name": "AnunciarPremioCobrado",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "indexReto",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "enum Habitos.CumplioReto",
+                  "name": "resultado",
+                  "type": "uint8"
+                }
+              ],
+              "name": "NotificacionDeGanador",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "id",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "user1",
+                  "type": "address"
+                }
+              ],
+              "name": "RetoCreado",
+              "type": "event"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "indexReto",
+                  "type": "uint256"
+                }
+              ],
+              "name": "completarRetoDiario",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "_name",
+                  "type": "string"
+                }
+              ],
+              "name": "crearReto",
+              "outputs": [],
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "indexReto",
+                  "type": "uint256"
+                }
+              ],
+              "name": "finalizarReto",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getRetosActivosPorUser",
+              "outputs": [
+                {
+                  "internalType": "uint256[]",
+                  "name": "",
+                  "type": "uint256[]"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "indexReto",
+                  "type": "uint256"
+                }
+              ],
+              "name": "reclamarPremio2",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "name": "retos",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "id",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "wallet",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "enum Habitos.CumplioReto",
+                      "name": "cumplioReto",
+                      "type": "uint8"
+                    },
+                    {
+                      "internalType": "enum Habitos.CobroPremio",
+                      "name": "cobroPremio",
+                      "type": "uint8"
+                    },
+                    {
+                      "internalType": "bool[3]",
+                      "name": "dias",
+                      "type": "bool[3]"
+                    }
+                  ],
+                  "internalType": "struct Habitos.User",
+                  "name": "user",
+                  "type": "tuple"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "deposito",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum Habitos.State",
+                  "name": "estado",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "fechaComienzo",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "totalRetos",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+        },
+        "Messenger": {
+          "address": "0x73DFB454f8cA90d93733C1e9f88FD9A8723a6370",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "_message",
+                  "type": "string"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "string",
+                  "name": "message",
+                  "type": "string"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "sender",
+                  "type": "address"
+                }
+              ],
+              "name": "newMessage",
+              "type": "event"
+            },
+            {
+              "inputs": [],
+              "name": "readMessage",
+              "outputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "_message",
+                  "type": "string"
+                }
+              ],
+              "name": "setMessage",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ]
+        },
         "Storage": {
-          "address": "0x5ba3ec4808A655381452f4b58C929e4200B4DF69",
+          "address": "0xA258951930E805F387795487299f44aC0f900290",
           "abi": [
             {
               "anonymous": false,
