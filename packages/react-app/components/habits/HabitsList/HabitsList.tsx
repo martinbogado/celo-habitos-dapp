@@ -15,7 +15,7 @@ const HABITS_LIST = gql`
     }
 `
 
-const HabitsList = () => {
+const HabitsList = ({ handleChecked }) => {
 
   const {data, loading, refetch, error} = useQuery(HABITS_LIST);
 
@@ -43,9 +43,14 @@ const HabitsList = () => {
               {
                   data.list.map( h => {
                       return(
-                          <div className={style.card}>
+                          <div className={style.card} key={h.img}>
+                              <div className={style.round}> 
+                                <input type="checkbox" id={h.img} value={h.habit} onChange={(e) => handleChecked(e)} />
+                                <label htmlFor={h.img}></label>
+                              </div>
                               <img src={`/images/habits/${h.img}.png`} alt={h.habit}/>
                               <h3>{h.habit}</h3>
+                              
                           </div>
                       )
                   })

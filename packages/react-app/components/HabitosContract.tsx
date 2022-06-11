@@ -31,17 +31,6 @@ const QUERY_STRING = gql`
         }
     }`
 
-const ADD_CHALLENGE = gql`
-    mutation AddNewChallenge($challenge: [challenges_insert_input!]!, $addhabits: [habits_insert_input!]!) {
-        insert_challenges(objects: $challenge) {
-            affected_rows
-        },
-        insert_habits(objects: $addhabits) {
-            affected_rows
-        }
-    }`
-
-
 export function HabitosContract({ contractData }) {
     
     const { kit, address, network, performActions } = useContractKit();
@@ -61,32 +50,10 @@ export function HabitosContract({ contractData }) {
  
             const oneGold = kit.connection.web3.utils.toWei('1', 'ether');
 
-            // const gasPrice = await contract.methods
-            //   .crearReto('nuevoReto')
-            //   .estimateGas();
-
-            // const tx = await kit.sendTransaction({
-            //   from: address,
-            //   to: contractData.address,
-            //   value: oneGold,
-            //   gasPrice: 1000000000,
-            // });
-
-            // const hash = await tx.getHash();
-            // const receipt = await tx.waitReceipt();
-          
             const result = await contract.methods
               .crearReto('nuevoReto' as string)
               .send({ from: address, value: oneGold });
 
-            // const celo = await kit._web3Contracts.getGoldToken()
-            // const transaction= await celo.methods.transfer(contractData.address,kit.web3.utils.toWei('1', 'ether')).send({
-            //   "from": address
-            // })
-            // console.log(transaction);  
-    
-            console.log(result);
-    
             const variant = result.status == true ? "success" : "error";
            
             const action: SnackbarAction = (key) => (
@@ -104,6 +71,8 @@ export function HabitosContract({ contractData }) {
               variant,
               action,
             });
+
+            return result.events['RetoCreado']?.returnValues.id
           });
         } catch (e) {
           enqueueSnackbar(e.message, {variant: 'error'});
@@ -154,49 +123,14 @@ export function HabitosContract({ contractData }) {
       });
     // console.log('The Graph query results', data);
  
-    // create function to run mutation
-    const [add_challenge, response] = useMutation(ADD_CHALLENGE)
-
-    // state to hold form data
+    
     const [form, setForm] = useState({habit: "", count: 0});
 
-    const habit1 = {
-        user: address,
-        habit: 'Jugar Pelota',
-        img: '',
-        description: 'Nose'
-    }
-
-    const habit2 = {
-        user: address,
-        habit: 'Jugar Volley',
-        img: '',
-        description: 'Nose'
-    }
 
     // handleChange function for form
     const handleChange = (e) => setForm({...form, [e.target.name]: e.target.value});
 
-    // handleSubmit function for when form is submitted
-    const handleSubmit = async (e) => {
-        // prevent refresh
-        e.preventDefault();
-        // add habit, pass in variables
-        await add_challenge({
-            variables: {
-                challenge: [{address: address}], 
-                addhabits: [habit1, habit2]
-            }
-        });
-        // refetch query to get new data
-        refetch();
-    }
-
-    // check if mutation failed
-    if(response.error){
-    <h1>Error al agregar un nuevo reto</h1>
-    }
-
+   
     // return value if the request errors
     if (error){  
         return(
@@ -236,25 +170,17 @@ export function HabitosContract({ contractData }) {
     // return value if the request is completed
     if (data){
     return <div className={style.container}>
-        {/* <form onSubmit={handleSubmit}>
-            <input type="text" name="habit" value={form.habit} onChange={handleChange}/>
-            <input type="number" name="count" value={form.count} onChange={handleChange}/>
-            <input type="submit" value="track habit"/>
-        </form> */}
         <HabitHeader streak={data.challenges[0]?.streak} loading={false} address={address}/>
        
         {data.challenges[0] ? 
             data.challenges[0].habits?.map( h => {
                 return(
-                  <Habit img={h.img} habit={h.habit} description={h.description} />
+                  <Habit img={h.img} habit={h.habit} description={h.description} key={h.img}/>
                 )
             })
           :
             <>
-              <NuevoReto crearReto={crearReto} /> 
-              <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={crearReto}>
-                Empezar nuevo reto
-              </Button>
+              <NuevoReto crearReto={crearReto} address={address} refetch={refetch}/> 
             </>
             
         }
