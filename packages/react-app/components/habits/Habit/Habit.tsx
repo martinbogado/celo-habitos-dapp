@@ -17,7 +17,7 @@ const Habit = ({ habit, description, img }) => {
   
   return (
     <div className={style.container}>
-        <img src={`/images/habits/${img}.png`} alt="" />
+        <img src={`/images/habits/${img}.png`} alt="" style={ checked ? {filter: 'grayscale(60%)'} : {}}/>
         <div>
             <h2 style={ checked ? { textDecoration : 'line-through', color: 'rgb(73, 73, 73)' } : {}}>{habit}</h2>
             <p style={ checked ? { textDecoration : 'line-through', color: 'rgb(73, 73, 73)' } : {}}>{description}</p>

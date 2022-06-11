@@ -15,11 +15,9 @@ const HABITS_LIST = gql`
     }
 `
 
-const HabitsList = ({ handleChecked }) => {
+const HabitsList = ({ handleChecked, habits, snackbar }) => {
 
   const {data, loading, refetch, error} = useQuery(HABITS_LIST);
-
-  console.log('Habits List', data);  
 
   if(loading){
       return(

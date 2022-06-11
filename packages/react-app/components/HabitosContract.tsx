@@ -21,8 +21,9 @@ import HabitHeader from "./habits/Header/HabitHeader";
 const QUERY_STRING = gql`
     query ChallengeInfo($user: String!) {
         challenges(where: {address: {_eq: $user}}) {
-          streak
           address
+          id
+          streak
           habits {
             habit
             img
@@ -44,6 +45,8 @@ export function HabitosContract({ contractData }) {
     : null;
     
     const crearReto = async () => {
+        let id;
+
         try {
           await performActions(async (kit) => {
             const { CELO } = await kit.getTotalBalance(address);
@@ -72,23 +75,27 @@ export function HabitosContract({ contractData }) {
               action,
             });
 
-            return result.events['RetoCreado']?.returnValues.id
+            console.log(result.events['RetoCreado']?.returnValues.id);
+            
+            id = result.events['RetoCreado']?.returnValues.id
           });
         } catch (e) {
           enqueueSnackbar(e.message, {variant: 'error'});
           console.log(e);
         }
+
+        return id
       };
 
-      const actualizarStreak = async () => {
+      const actualizarStreak = async (id) => {
         try {
           await performActions(async (kit) => {
             const gasLimit = await contract.methods
-              .completarRetoDiario(1)
+              .completarRetoDiario(id)
               .estimateGas();
     
             const result = await contract.methods
-              .completarRetoDiario(1)
+              .completarRetoDiario(id)
               //@ts-ignore
               .send({ from: address, gasLimit });
     
@@ -113,7 +120,7 @@ export function HabitosContract({ contractData }) {
             });
           });
         } catch (e) {
-          enqueueSnackbar(e.message, {variant: 'error'});
+          enqueueSnackbar(e.data.message, {variant: 'error'});
           console.log(e);
         }
       };
@@ -185,7 +192,7 @@ export function HabitosContract({ contractData }) {
             
         }
         {data.challenges[0] && (
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={actualizarStreak}>
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarStreak(data.challenges[0].id)}>
                 Completar Dia
             </Button>
         )}
