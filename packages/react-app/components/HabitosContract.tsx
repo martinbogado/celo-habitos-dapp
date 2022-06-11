@@ -32,10 +32,26 @@ const QUERY_STRING = gql`
         }
     }`
 
+const UPDATE_STREAK = gql`
+    mutation UpdateStreak($user: String!) {
+      update_challenges(where: {address: {_eq: $user}}, _inc: {streak: 1}) {
+        affected_rows
+      }
+    }`
+
 export function HabitosContract({ contractData }) {
     
     const { kit, address, network, performActions } = useContractKit();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const [completed, setCompleted] = useState([]);
+    console.log(completed);
+
+    const {data, loading, refetch, error} = useQuery(QUERY_STRING,{
+      variables: { user: address },
+    });
+    // console.log('The Graph query results', data);
+
+    const [update_streak, response] = useMutation(UPDATE_STREAK);
 
     const contract = contractData
     ? (new kit.web3.eth.Contract(
@@ -43,7 +59,7 @@ export function HabitosContract({ contractData }) {
         contractData.address
       ) as any as Habitos)
     : null;
-    
+
     const crearReto = async () => {
         let id;
 
@@ -102,6 +118,18 @@ export function HabitosContract({ contractData }) {
             console.log(result);
     
             const variant = result.status == true ? "success" : "error";
+
+            if(result.status == true){
+              await update_streak({
+                variables: {
+                  user: address
+                }
+              });
+
+              refetch();
+              setCompleted([]);
+              console.log(response);
+            }
            
             const action: SnackbarAction = (key) => (
               <>    
@@ -120,24 +148,31 @@ export function HabitosContract({ contractData }) {
             });
           });
         } catch (e) {
-          enqueueSnackbar(e.data.message, {variant: 'error'});
+          enqueueSnackbar(e.message, {variant: 'error'});
           console.log(e);
         }
       };
 
-    const {data, loading, refetch, error} = useQuery(QUERY_STRING,{
-        variables: { user: address },
-      });
-    // console.log('The Graph query results', data);
- 
+    function handleChecked(e){
+        if (e.target.checked) { 
+            setCompleted([...completed, {
+                habit: e.target.value
+            }]);   
+        } else if (!e.target.checked) {
+            setCompleted(
+              completed.filter(el => el.habit !== e.target.value)
+            ) 
+        }
+      };
+
+    function habitosCompletados(){
+      if(data.challenges[0].habits.length !== completed.length){
+        enqueueSnackbar("Debe completar todos los habitos antes de terminar el dia", {variant: 'error', autoHideDuration: 2500});
+        return true
+      }
+      return false
+    }
     
-    const [form, setForm] = useState({habit: "", count: 0});
-
-
-    // handleChange function for form
-    const handleChange = (e) => setForm({...form, [e.target.name]: e.target.value});
-
-   
     // return value if the request errors
     if (error){  
         return(
@@ -182,7 +217,13 @@ export function HabitosContract({ contractData }) {
         {data.challenges[0] ? 
             data.challenges[0].habits?.map( h => {
                 return(
-                  <Habit img={h.img} habit={h.habit} description={h.description} key={h.img}/>
+                  <Habit 
+                    img={h.img} 
+                    habit={h.habit} 
+                    description={h.description} 
+                    key={h.img} handleChecked={handleChecked} 
+                    checked={!!completed.filter( el => el.habit === h.habit).length}
+                  />
                 )
             })
           :
@@ -192,7 +233,7 @@ export function HabitosContract({ contractData }) {
             
         }
         {data.challenges[0] && (
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarStreak(data.challenges[0].id)}>
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarStreak(data.challenges[0].id)} disabled={habitosCompletados()}>
                 Completar Dia
             </Button>
         )}
