@@ -16,6 +16,7 @@ import { TbPlugConnected } from 'react-icons/tb';
 import NuevoReto from "./habits/NuevoReto/NuevoReto";
 import Habit from "./habits/Habit/Habit";
 import HabitHeader from "./habits/Header/HabitHeader";
+import Finalizar from "./habits/FinalizarReto/Finalizar";
 
 // GraphQL Query String
 const QUERY_STRING = gql`
@@ -45,7 +46,6 @@ export function HabitosContract({ contractData }) {
     const { kit, address, network, performActions } = useContractKit();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [completed, setCompleted] = useState([]);
-    console.log(completed);
 
     const {data, loading, refetch, error} = useQuery(QUERY_STRING,{
       variables: { user: address },
@@ -125,12 +125,6 @@ export function HabitosContract({ contractData }) {
       try {
         await performActions(async (kit) => {
 
-          const statusReto = await contract.methods
-            .retosActivoPorId(id)
-            .call();
-
-          console.log(statusReto);
-
           const gasLimit = await contract.methods
             .completarRetoDiario(id)
             .estimateGas();
@@ -196,6 +190,51 @@ export function HabitosContract({ contractData }) {
       }
 
       return status
+    }
+
+    const finalizarReto = async (id) => {
+      let response;
+
+      try {
+        await performActions(async (kit) => {
+          const gasLimit = await contract.methods
+            .finalizarReto(id)
+            .estimateGas();
+  
+          const result = await contract.methods
+            .finalizarReto(id)
+            //@ts-ignore
+            .send({ from: address, gasLimit });
+  
+          response = result.status
+
+        });
+      } catch (e) {
+        enqueueSnackbar(e.message, {variant: 'error'});
+        console.log(e);
+      }
+
+      return response;
+    }
+
+    const cobrarPremio = async (id) => {
+      try {
+        await performActions(async (kit) => {
+          const gasLimit = await contract.methods
+            .reclamarPremio2(id)
+            .estimateGas();
+  
+          const result = await contract.methods
+            .reclamarPremio2(id)
+            //@ts-ignore
+            .send({ from: address, gasLimit });
+
+            console.log(result)
+        });
+      } catch (e) {
+        enqueueSnackbar(e.message, {variant: 'error'});
+        console.log(e);
+      }
     }
 
     const actualizarChallenge = async (id) => {
@@ -264,11 +303,7 @@ export function HabitosContract({ contractData }) {
        
         {data.challenges[0] ? 
             retoFinalizado ? 
-            <>
-              <Button sx={{ m: 1, marginTop: 4 }} variant="contained" >
-                Finalizar Reto
-              </Button>
-            </>
+            <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} />
             :
             data.challenges[0].habits?.map( h => {
                 return(
