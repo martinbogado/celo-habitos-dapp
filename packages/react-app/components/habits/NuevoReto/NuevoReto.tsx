@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { Box, Button, Divider, Grid, Typography, Link, Modal } from "@mui/material";
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 
 import {useMutation, gql} from "@apollo/client";
 
@@ -21,6 +22,31 @@ const ADD_CHALLENGE = gql`
     }`
 
 const NuevoReto = ({ crearReto, address, refetch }) => {
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    return(
+        <div>
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleOpen}>
+              Comenzar nuevo reto
+            </Button>
+            <Modal
+              open={open}
+              onClose={handleClose}
+            >
+                <div className={style.newChallenges}>
+                    <ElegirReto crearReto={crearReto} address={address} refetch={refetch} />
+                </div>
+            </Modal>
+        </div>
+    )
+}
+
+export default NuevoReto
+
+const ElegirReto = ({ crearReto, address, refetch}) => {
     const [open, setOpen] = useState(false);
     const [habits, setHabits] = useState([]);
     const [error, setError] = useState(false);
@@ -91,20 +117,22 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
         <h1>Error al crear un nuevo reto</h1>
     }
 
-
     return(
         <div>
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleOpen}>
-              Comenzar nuevo reto
-            </Button>
+            <ChallengeCard reto='Reto de 3 minutos' status='active'  img='calendario' handleOpen={handleOpen}/>
+
+            <ChallengeCard reto='Reto de 14 dias' status='inactive'  img='campana' handleOpen={handleOpen}/>
+
+            <ChallengeCard reto='Reto de 30 dias' status='inactive'  img='campana' handleOpen={handleOpen}/>
+
             <Modal
               open={open}
               onClose={handleClose}
             >
                 <div className={style.list}>
-                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleClose} className={style.close} >
-                        X
-                    </Button>
+                    <button onClick={handleClose} className={style.close} >
+                        <AiOutlineCloseCircle />
+                    </button>
                     <HabitsList handleChecked={handleChecked} habits={habits} snackbar={enqueueSnackbar}/>
                     <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={(e) => crearNuevoReto(e)} disabled={disableBtn()}>
                         Empezar nuevo reto
@@ -115,4 +143,20 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
     )
 }
 
-export default NuevoReto
+const ChallengeCard = ({ reto, status, img, handleOpen }) => {
+
+    function activeChallenge(){
+        status === 'active' && handleOpen()
+    }
+
+    return(
+        <div onClick={activeChallenge} className={style.newChallengeCard} style={ status === 'active' ? {cursor: 'pointer'} : { backgroundColor: '#9b9b9e', color: 'black'}}>
+            <div className={style.challengeInfo}>
+                <h2>{reto}</h2>
+                <span>{ status === 'active' ? 'Comienza tu nuevo reto' : 'Cooming Soon'}</span>
+            </div>
+            <img src={`/images/newChallenge/${img}.png`} alt={status} />
+            <img src="/images/newChallenge/effect.png" alt="Efecto" className={style.effect}/>
+        </div>
+    )
+}
