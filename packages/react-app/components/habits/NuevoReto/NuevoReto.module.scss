@@ -17,6 +17,12 @@
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     padding: 2rem;
 
+    span {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
     ::-webkit-scrollbar {
     width: 3px;
     height: 7px;

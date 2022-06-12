@@ -104,6 +104,11 @@ export function HabitosContract({ contractData }) {
       };
 
       const actualizarStreak = async (id) => {
+        if(data.challenges[0].habits.length !== completed.length){
+          enqueueSnackbar("Debe completar todos los habitos antes de terminar el dia", {variant: 'error', autoHideDuration: 2500});
+          return
+        }
+
         try {
           await performActions(async (kit) => {
             const gasLimit = await contract.methods
@@ -164,15 +169,7 @@ export function HabitosContract({ contractData }) {
             ) 
         }
       };
-
-    function habitosCompletados(){
-      if(data.challenges[0].habits.length !== completed.length){
-        enqueueSnackbar("Debe completar todos los habitos antes de terminar el dia", {variant: 'error', autoHideDuration: 2500});
-        return true
-      }
-      return false
-    }
-    
+   
     // return value if the request errors
     if (error){  
         return(
@@ -233,7 +230,7 @@ export function HabitosContract({ contractData }) {
             
         }
         {data.challenges[0] && (
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarStreak(data.challenges[0].id)} disabled={habitosCompletados()}>
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarStreak(data.challenges[0].id)} style={data.challenges[0].habits.length !== completed.length ? {cursor: 'not-allowed'} : {}}>
                 Completar Dia
             </Button>
         )}

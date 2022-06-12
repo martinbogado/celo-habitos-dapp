@@ -64,6 +64,10 @@ const ElegirReto = ({ crearReto, address, refetch}) => {
 
     function handleChecked(e){
         if (e.target.checked) { 
+            if(habits.length >= 3){
+                enqueueSnackbar("No puede elegir mas de 3 habitos por reto", {variant: 'error', autoHideDuration: 2500});
+            }
+
             setHabits([...habits, {
                 user: address,
                 habit: e.target.value,
@@ -95,22 +99,19 @@ const ElegirReto = ({ crearReto, address, refetch}) => {
     async function crearNuevoReto(e){
         e.preventDefault();
 
+        if(habits.length >= 4){
+            enqueueSnackbar("No puede elegir mas de 3 habitos por reto", {variant: 'error', autoHideDuration: 2500});
+            return
+        } else if(!habits.length){
+            enqueueSnackbar("Debe elegirse al menos 1 habito para empezar el reto", {variant: 'error', autoHideDuration: 2500});
+            return
+        }
+
         const id = await crearReto();
         console.log(id);
 
         crearRetoEnBD(id);
     } 
-
-    function disableBtn(){
-        if(habits.length >= 4){
-            enqueueSnackbar("No puede elegir mas de 3 habitos por reto", {variant: 'error', autoHideDuration: 2500});
-            return true
-        } else if(!habits.length){
-            enqueueSnackbar("Debe elegirse al menos 1 habito para empezar el reto", {variant: 'error', autoHideDuration: 2500});
-            return true
-        }
-        return false
-    }
 
     // check if mutation failed
     if(response.error){
@@ -133,8 +134,9 @@ const ElegirReto = ({ crearReto, address, refetch}) => {
                     <button onClick={handleClose} className={style.close} >
                         <AiOutlineCloseCircle />
                     </button>
+                    <span className={style.title}>Elige hasta 3 habitos para tu nuevo reto</span>
                     <HabitsList handleChecked={handleChecked} habits={habits} snackbar={enqueueSnackbar}/>
-                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={(e) => crearNuevoReto(e)} disabled={disableBtn()}>
+                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={(e) => crearNuevoReto(e)} style={habits.length >= 4 || !habits.length ? {cursor:'not-allowed'} : {}}>
                         Empezar nuevo reto
                     </Button>
                 </div>
