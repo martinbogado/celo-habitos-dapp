@@ -7,7 +7,7 @@ import { Divider } from '@mui/material';
 import style from './HabitHeader.module.scss';
 import { truncateAddress } from '@/utils';
 
-const HabitHeader = ({ streak, loading, address, allCompleted, habitsLeft, retoCreado }) => {
+const HabitHeader = ({ streak, loading, address, allCompleted, habitsLeft, retoCreado, retoFinalizado }) => {
 
   return (
     <div className={style.container}>
@@ -30,6 +30,15 @@ const HabitHeader = ({ streak, loading, address, allCompleted, habitsLeft, retoC
           address ?
 
           retoCreado ?
+
+          retoFinalizado ?
+
+          <>
+            <MdOutlineWhatshot />
+            Tu reto ha terminado
+          </>
+
+          :
 
           allCompleted ?
           <>

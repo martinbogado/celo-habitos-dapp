@@ -92,7 +92,7 @@ const ElegirReto = ({ crearReto, address, refetch}) => {
         handleClose();
         refetch();
       } else {
-        enqueueSnackbar("Ocurrio un error al intentar crear el reto, porfavor intente de nuevo", {variant: 'error', autoHideDuration: 2500});
+        enqueueSnackbar("Ocurrio un error al intentar crear el reto, porfavor intente de nuevo", {variant: 'error', autoHideDuration: 4000});
       }
     }
 

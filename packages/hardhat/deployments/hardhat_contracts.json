@@ -228,7 +228,7 @@
           ]
         },
         "Habitos": {
-          "address": "0xbe2D414bd2d03f69b82EAf0b8505aF2b3D6AE34e",
+          "address": "0x37B6E4BC27E63457e1E17a1Fc25af0866109705f",
           "abi": [
             {
               "inputs": [],
@@ -418,6 +418,25 @@
                   "internalType": "uint256",
                   "name": "fechaComienzo",
                   "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "indexReto",
+                  "type": "uint256"
+                }
+              ],
+              "name": "retosActivoPorId",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "_status",
+                  "type": "bool"
                 }
               ],
               "stateMutability": "view",
