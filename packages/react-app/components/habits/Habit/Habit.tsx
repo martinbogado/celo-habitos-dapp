@@ -11,7 +11,7 @@ const Habit = ({ habit, description, img, handleChecked, checked }) => {
             <p style={ checked ? { textDecoration : 'line-through', color: 'rgb(73, 73, 73)' } : {}}>{description}</p>
         </div>
         <div className={style.round}> 
-            <input type="checkbox" id={habit} value={habit} onChange={handleChecked}/>
+            <input type="checkbox" id={habit} checked={checked} value={habit} onChange={handleChecked}/>
             <label htmlFor={habit}></label>
         </div>
     </div>
