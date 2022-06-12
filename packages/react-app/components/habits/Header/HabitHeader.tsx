@@ -1,11 +1,13 @@
 import React from 'react';
 import { BsLightningCharge, BsTrophy, BsJournalBookmark } from 'react-icons/bs';
+import { VscNewFile } from 'react-icons/vsc';
+import { MdOutlineWhatshot } from 'react-icons/md';
 import { FiUserX } from 'react-icons/fi';
 import { Divider } from '@mui/material';
 import style from './HabitHeader.module.scss';
 import { truncateAddress } from '@/utils';
 
-const HabitHeader = ({ streak, loading, address }) => {
+const HabitHeader = ({ streak, loading, address, allCompleted, habitsLeft, retoCreado }) => {
 
   return (
     <div className={style.container}>
@@ -15,8 +17,8 @@ const HabitHeader = ({ streak, loading, address }) => {
           <h2>Celominder</h2>
         </div>
         {
-          !loading && (
-            <div className={style.streak}>
+          (!loading && retoCreado) && (
+            <div className={style.streak} style={ streak !== 0 ? {color: 'rgb(233, 193, 14)'} : {}}>
               <BsLightningCharge />
               <p>{streak} day Streak</p>
             </div>
@@ -25,11 +27,28 @@ const HabitHeader = ({ streak, loading, address }) => {
       </div>
       <div className={style.completed}>
         {
-          address ? 
+          address ?
+
+          retoCreado ?
+
+          allCompleted ?
           <>
             <BsTrophy />
             Todos los habitos completados
           </>
+          :
+          <>
+            <BsJournalBookmark />
+            Te faltan {habitsLeft} habitos para completar el dia
+          </>
+
+          :
+
+          <>
+            <VscNewFile />
+            Primero debes crear un reto 
+          </>
+
           :
           <>
            <FiUserX />

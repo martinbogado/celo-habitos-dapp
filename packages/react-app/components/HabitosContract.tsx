@@ -177,7 +177,7 @@ export function HabitosContract({ contractData }) {
     if (error){  
         return(
             <div className={style.container}>
-                <HabitHeader streak={null} loading={true} address={address} />
+                <HabitHeader streak={null} loading={true} address={address} retoCreado={!!data?.challenges[0]} allCompleted={null} habitsLeft={null}/>
              { error.message == 'unexpected null value for type "String"' ?
                 <div className={style.connectWallet}>
                     <TbPlugConnected />
@@ -201,7 +201,7 @@ export function HabitosContract({ contractData }) {
     if (loading) {
     return(
         <div className={style.container}>
-            <HabitHeader streak={null} loading={true} address={address}/>
+            <HabitHeader streak={null} loading={true} address={address} retoCreado={!!data?.challenges[0]} allCompleted={null} habitsLeft={null}/>
             <div className={style.loading}>
                 <p>La información esta cargando</p>
                 <img src="/images/loading.gif" alt="Loading" />
@@ -212,7 +212,7 @@ export function HabitosContract({ contractData }) {
     // return value if the request is completed
     if (data){
     return <div className={style.container}>
-        <HabitHeader streak={data.challenges[0]?.streak} loading={false} address={address}/>
+        <HabitHeader streak={data.challenges[0]?.streak} loading={false} retoCreado={!!data.challenges[0]} address={address} allCompleted={data.challenges[0]?.habits.length === completed.length} habitsLeft={data.challenges[0]?.habits.length - completed.length} />
        
         {data.challenges[0] ? 
             data.challenges[0].habits?.map( h => {
