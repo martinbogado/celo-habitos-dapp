@@ -37,7 +37,7 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
               onClose={handleClose}
             >
                 <div className={style.newChallenges}>
-                    <ElegirReto crearReto={crearReto} address={address} refetch={refetch} />
+                    <ElegirReto crearReto={crearReto} address={address} refetch={refetch} close={handleClose} />
                 </div>
             </Modal>
         </div>
@@ -46,7 +46,7 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
 
 export default NuevoReto
 
-const ElegirReto = ({ crearReto, address, refetch}) => {
+const ElegirReto = ({ crearReto, address, refetch, close}) => {
     const [open, setOpen] = useState(false);
     const [habits, setHabits] = useState([]);
     const [error, setError] = useState(false);
@@ -89,7 +89,6 @@ const ElegirReto = ({ crearReto, address, refetch}) => {
             }
         });
   
-        handleClose();
         refetch();
       } else {
         enqueueSnackbar("Ocurrio un error al intentar crear el reto, porfavor intente de nuevo", {variant: 'error', autoHideDuration: 4000});
@@ -107,8 +106,10 @@ const ElegirReto = ({ crearReto, address, refetch}) => {
             return
         }
 
+        handleClose();
+        close();
+
         const id = await crearReto();
-        console.log(id);
 
         crearRetoEnBD(id);
     } 

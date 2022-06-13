@@ -6,6 +6,7 @@ import { FiUserX } from 'react-icons/fi';
 import { Divider } from '@mui/material';
 import style from './HabitHeader.module.scss';
 import { truncateAddress } from '@/utils';
+import Calendar from '../Calendar/Calendar';
 
 const HabitHeader = ({ streak, loading, address, allCompleted, habitsLeft, retoCreado, retoFinalizado }) => {
 
@@ -67,6 +68,7 @@ const HabitHeader = ({ streak, loading, address, allCompleted, habitsLeft, retoC
         
       </div>
       <Divider sx={{ m: 1 }} />
+      <Calendar />
       <div className={style.address}>
       {address && <span >Estas logeado con la address <strong>{truncateAddress(address)}</strong></span>}
       </div>

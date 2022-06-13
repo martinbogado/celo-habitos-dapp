@@ -321,7 +321,7 @@ export function HabitosContract({ contractData }) {
     if (data){
     return <div className={style.container}>
         <HabitHeader streak={data.challenges[0]?.streak} loading={false} retoCreado={!!data.challenges[0]} address={address} allCompleted={data.challenges[0]?.habits.length === completed.length} habitsLeft={data.challenges[0]?.habits.length - completed.length} retoFinalizado={retoFinalizado}/>
-       
+
         {data.challenges[0] ? 
             retoFinalizado ? 
             <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} exito={data.challenges[0].streak === 3} refetch={refetch} address={address} />
