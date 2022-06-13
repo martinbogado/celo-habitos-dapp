@@ -53,3 +53,20 @@
         }
     }
 }
+
+.loading{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    span {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    img {
+        max-width: 60%;
+    }
+}

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { Box, Button, Divider, Grid, Typography, Link, Modal } from "@mui/material";
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 
 import {useMutation, gql} from "@apollo/client";
 
@@ -22,6 +23,31 @@ const ADD_CHALLENGE = gql`
 
 const NuevoReto = ({ crearReto, address, refetch }) => {
     const [open, setOpen] = useState(false);
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    return(
+        <div>
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleOpen}>
+              Comenzar nuevo reto
+            </Button>
+            <Modal
+              open={open}
+              onClose={handleClose}
+            >
+                <div className={style.newChallenges}>
+                    <ElegirReto crearReto={crearReto} address={address} refetch={refetch} close={handleClose} />
+                </div>
+            </Modal>
+        </div>
+    )
+}
+
+export default NuevoReto
+
+const ElegirReto = ({ crearReto, address, refetch, close}) => {
+    const [open, setOpen] = useState(false);
     const [habits, setHabits] = useState([]);
     const [error, setError] = useState(false);
 
@@ -38,6 +64,10 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
 
     function handleChecked(e){
         if (e.target.checked) { 
+            if(habits.length >= 3){
+                enqueueSnackbar("No puede elegir mas de 3 habitos por reto", {variant: 'error', autoHideDuration: 2500});
+            }
+
             setHabits([...habits, {
                 user: address,
                 habit: e.target.value,
@@ -59,54 +89,55 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
             }
         });
   
-        handleClose();
         refetch();
       } else {
-        enqueueSnackbar("Ocurrio un error al intentar crear el reto, porfavor intente de nuevo", {variant: 'error', autoHideDuration: 2500});
+        enqueueSnackbar("Ocurrio un error al intentar crear el reto, porfavor intente de nuevo", {variant: 'error', autoHideDuration: 4000});
       }
     }
 
     async function crearNuevoReto(e){
         e.preventDefault();
 
+        if(habits.length >= 4){
+            enqueueSnackbar("No puede elegir mas de 3 habitos por reto", {variant: 'error', autoHideDuration: 2500});
+            return
+        } else if(!habits.length){
+            enqueueSnackbar("Debe elegirse al menos 1 habito para empezar el reto", {variant: 'error', autoHideDuration: 2500});
+            return
+        }
+
+        handleClose();
+        close();
+
         const id = await crearReto();
-        console.log(id);
 
         crearRetoEnBD(id);
     } 
-
-    function disableBtn(){
-        if(habits.length >= 4){
-            enqueueSnackbar("No puede elegir mas de 3 habitos por reto", {variant: 'error', autoHideDuration: 2500});
-            return true
-        } else if(!habits.length){
-            enqueueSnackbar("Debe elegirse al menos 1 habito para empezar el reto", {variant: 'error', autoHideDuration: 2500});
-            return true
-        }
-        return false
-    }
 
     // check if mutation failed
     if(response.error){
         <h1>Error al crear un nuevo reto</h1>
     }
 
-
     return(
         <div>
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleOpen}>
-              Comenzar nuevo reto
-            </Button>
+            <ChallengeCard reto='Reto de 3 minutos' status='active'  img='calendario' handleOpen={handleOpen}/>
+
+            <ChallengeCard reto='Reto de 14 dias' status='inactive'  img='campana' handleOpen={handleOpen}/>
+
+            <ChallengeCard reto='Reto de 30 dias' status='inactive'  img='campana' handleOpen={handleOpen}/>
+
             <Modal
               open={open}
               onClose={handleClose}
             >
                 <div className={style.list}>
-                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={handleClose} className={style.close} >
-                        X
-                    </Button>
+                    <button onClick={handleClose} className={style.close} >
+                        <AiOutlineCloseCircle />
+                    </button>
+                    <span className={style.title}>Elige hasta 3 habitos para tu nuevo reto</span>
                     <HabitsList handleChecked={handleChecked} habits={habits} snackbar={enqueueSnackbar}/>
-                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={(e) => crearNuevoReto(e)} disabled={disableBtn()}>
+                    <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={(e) => crearNuevoReto(e)} style={habits.length >= 4 || !habits.length ? {cursor:'not-allowed'} : {}}>
                         Empezar nuevo reto
                     </Button>
                 </div>
@@ -115,4 +146,20 @@ const NuevoReto = ({ crearReto, address, refetch }) => {
     )
 }
 
-export default NuevoReto
+const ChallengeCard = ({ reto, status, img, handleOpen }) => {
+
+    function activeChallenge(){
+        status === 'active' && handleOpen()
+    }
+
+    return(
+        <div onClick={activeChallenge} className={style.newChallengeCard} style={ status === 'active' ? {cursor: 'pointer'} : { backgroundColor: '#9b9b9e', color: 'black'}}>
+            <div className={style.challengeInfo}>
+                <h2>{reto}</h2>
+                <span>{ status === 'active' ? 'Comienza tu nuevo reto' : 'Cooming Soon'}</span>
+            </div>
+            <img src={`/images/newChallenge/${img}.png`} alt={status} />
+            <img src="/images/newChallenge/effect.png" alt="Efecto" className={style.effect}/>
+        </div>
+    )
+}

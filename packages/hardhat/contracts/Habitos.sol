@@ -91,6 +91,12 @@ contract Habitos {
         retos[indexReto].user.dias[dia] = true;  
     }
 
+    //Funcion para saber si el reto sigue activo o a finalizado
+    function retosActivoPorId(uint indexReto) public view onlyRetoEmpezado(indexReto) onlyUser(indexReto) returns(bool _status){
+        uint dia = calcularDia(indexReto);
+        return dia >= 3;
+    }
+
     function calcularDia(uint indexReto) internal onlyRetoEmpezado(indexReto) view returns(uint) {
         uint diasTranscurridos = (block.timestamp - retos[indexReto].fechaComienzo) / (1 minutes);
         return diasTranscurridos;

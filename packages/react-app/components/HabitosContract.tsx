@@ -16,6 +16,7 @@ import { TbPlugConnected } from 'react-icons/tb';
 import NuevoReto from "./habits/NuevoReto/NuevoReto";
 import Habit from "./habits/Habit/Habit";
 import HabitHeader from "./habits/Header/HabitHeader";
+import Finalizar from "./habits/FinalizarReto/Finalizar";
 
 // GraphQL Query String
 const QUERY_STRING = gql`
@@ -40,16 +41,22 @@ const UPDATE_STREAK = gql`
     }`
 
 export function HabitosContract({ contractData }) {
-    
+
+    const [ retoFinalizado, setRetoFinalizado ] = useState(false);  
     const { kit, address, network, performActions } = useContractKit();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [completed, setCompleted] = useState([]);
-    console.log(completed);
 
     const {data, loading, refetch, error} = useQuery(QUERY_STRING,{
       variables: { user: address },
     });
     // console.log('The Graph query results', data);
+
+    useEffect(() => {
+      if(data?.challenges[0]){    
+        reloadUpdateStatus(data.challenges[0].id)
+      }
+    },[data])
 
     const [update_streak, response] = useMutation(UPDATE_STREAK);
 
@@ -59,6 +66,12 @@ export function HabitosContract({ contractData }) {
         contractData.address
       ) as any as Habitos)
     : null;
+
+    async function reloadUpdateStatus(id){
+      const status = await actualizarStatus(id);
+
+      setRetoFinalizado(status);
+    }
 
     const crearReto = async () => {
         let id;
@@ -91,8 +104,6 @@ export function HabitosContract({ contractData }) {
               action,
             });
 
-            console.log(result.events['RetoCreado']?.returnValues.id);
-            
             id = result.events['RetoCreado']?.returnValues.id
           });
         } catch (e) {
@@ -103,36 +114,127 @@ export function HabitosContract({ contractData }) {
         return id
       };
 
-      const actualizarStreak = async (id) => {
-        try {
-          await performActions(async (kit) => {
-            const gasLimit = await contract.methods
-              .completarRetoDiario(id)
-              .estimateGas();
-    
-            const result = await contract.methods
-              .completarRetoDiario(id)
-              //@ts-ignore
-              .send({ from: address, gasLimit });
-    
-            console.log(result);
-    
+    const actualizarStreak = async (id) => {
+      if(data.challenges[0].habits.length !== completed.length){
+        enqueueSnackbar("Debe completar todos los habitos antes de terminar el dia", {variant: 'error', autoHideDuration: 2500});
+        return
+      }
+ 
+      try {
+        await performActions(async (kit) => {
+
+          const gasLimit = await contract.methods
+            .completarRetoDiario(id)
+            .estimateGas();
+  
+          const result = await contract.methods
+            .completarRetoDiario(id)
+            //@ts-ignore
+            .send({ from: address, gasLimit });
+  
+          console.log(result);
+  
+          const variant = result.status == true ? "success" : "error";
+
+          if(result.status == true){
+            await update_streak({
+              variables: {
+                user: address
+              }
+            });
+
+            refetch();
+            setCompleted([]);
+            console.log(response);
+          }
+          
+          const action: SnackbarAction = (key) => (
+            <>    
+              <Button
+                onClick={() => {
+                  closeSnackbar(key);
+                }}
+              >
+                X
+              </Button>
+            </>
+          );
+          enqueueSnackbar("Habitos del Dia Completados", {
+            variant,
+            action,
+          });
+        });
+      } catch (e) {
+        enqueueSnackbar("Ya se cumplio el reto del dia de hoy", {variant: 'error'});
+        console.log(e);
+      }
+    };
+
+    const actualizarStatus = async (id) => {
+      let status;
+
+      try {
+        await performActions(async (kit) => {
+
+          const statusReto = await contract.methods
+            .retosActivoPorId(id)
+            .call();
+
+          status = statusReto;
+        });
+      } catch (e) {
+        enqueueSnackbar(e.message, {variant: 'error'});
+        console.log(e);
+      }
+
+      return status
+    }
+
+    const finalizarReto = async (id) => {
+      let response;
+
+      try {
+        await performActions(async (kit) => {
+          const gasLimit = await contract.methods
+            .finalizarReto(id)
+            .estimateGas();
+  
+          const result = await contract.methods
+            .finalizarReto(id)
+            //@ts-ignore
+            .send({ from: address, gasLimit });
+  
+          response = result.status
+
+        });
+      } catch (e) {
+        enqueueSnackbar(e.message, {variant: 'error'});
+        console.log(e);
+      }
+
+      return response;
+    }
+
+    const cobrarPremio = async (id) => {
+      let response;
+
+      try {
+        await performActions(async (kit) => {
+          const gasLimit = await contract.methods
+            .reclamarPremio2(id)
+            .estimateGas();
+  
+          const result = await contract.methods
+            .reclamarPremio2(id)
+            //@ts-ignore
+            .send({ from: address, gasLimit });
+
+            response = result.status
+
             const variant = result.status == true ? "success" : "error";
-
-            if(result.status == true){
-              await update_streak({
-                variables: {
-                  user: address
-                }
-              });
-
-              refetch();
-              setCompleted([]);
-              console.log(response);
-            }
            
             const action: SnackbarAction = (key) => (
-              <>    
+              <>  
                 <Button
                   onClick={() => {
                     closeSnackbar(key);
@@ -142,17 +244,31 @@ export function HabitosContract({ contractData }) {
                 </Button>
               </>
             );
-            enqueueSnackbar("Habitos del Dia Completados", {
+
+            enqueueSnackbar("Ha cobrado exitosamente su premio", {
               variant,
               action,
             });
-          });
-        } catch (e) {
-          enqueueSnackbar(e.message, {variant: 'error'});
-          console.log(e);
-        }
-      };
+        });
+      } catch (e) {
+        enqueueSnackbar(e.message, {variant: 'error'});
+        console.log(e);
+      }
 
+      return response
+    }
+
+    const actualizarChallenge = async (id) => {
+      const status = await actualizarStatus(id);
+
+      if(!status){
+        actualizarStreak(id);
+      } else{
+        enqueueSnackbar("El reto ha finalizado", {variant: 'error', autoHideDuration: 3000});
+        setRetoFinalizado(status);
+      }
+    }
+    
     function handleChecked(e){
         if (e.target.checked) { 
             setCompleted([...completed, {
@@ -164,20 +280,12 @@ export function HabitosContract({ contractData }) {
             ) 
         }
       };
-
-    function habitosCompletados(){
-      if(data.challenges[0].habits.length !== completed.length){
-        enqueueSnackbar("Debe completar todos los habitos antes de terminar el dia", {variant: 'error', autoHideDuration: 2500});
-        return true
-      }
-      return false
-    }
-    
+   
     // return value if the request errors
     if (error){  
         return(
             <div className={style.container}>
-                <HabitHeader streak={null} loading={true} address={address} />
+                <HabitHeader streak={null} loading={true} address={address} retoCreado={!!data?.challenges[0]} allCompleted={null} habitsLeft={null} retoFinalizado={retoFinalizado}/>
              { error.message == 'unexpected null value for type "String"' ?
                 <div className={style.connectWallet}>
                     <TbPlugConnected />
@@ -201,7 +309,7 @@ export function HabitosContract({ contractData }) {
     if (loading) {
     return(
         <div className={style.container}>
-            <HabitHeader streak={null} loading={true} address={address}/>
+            <HabitHeader streak={null} loading={true} address={address} retoCreado={!!data?.challenges[0]} allCompleted={null} habitsLeft={null} retoFinalizado={retoFinalizado}/>
             <div className={style.loading}>
                 <p>La información esta cargando</p>
                 <img src="/images/loading.gif" alt="Loading" />
@@ -212,9 +320,12 @@ export function HabitosContract({ contractData }) {
     // return value if the request is completed
     if (data){
     return <div className={style.container}>
-        <HabitHeader streak={data.challenges[0]?.streak} loading={false} address={address}/>
-       
+        <HabitHeader streak={data.challenges[0]?.streak} loading={false} retoCreado={!!data.challenges[0]} address={address} allCompleted={data.challenges[0]?.habits.length === completed.length} habitsLeft={data.challenges[0]?.habits.length - completed.length} retoFinalizado={retoFinalizado}/>
+
         {data.challenges[0] ? 
+            retoFinalizado ? 
+            <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} exito={data.challenges[0].streak === 3} refetch={refetch} address={address} />
+            :
             data.challenges[0].habits?.map( h => {
                 return(
                   <Habit 
@@ -232,8 +343,8 @@ export function HabitosContract({ contractData }) {
             </>
             
         }
-        {data.challenges[0] && (
-            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarStreak(data.challenges[0].id)} disabled={habitosCompletados()}>
+        { (data.challenges[0] && !retoFinalizado) && (
+            <Button sx={{ m: 1, marginTop: 4 }} variant="contained" onClick={() => actualizarChallenge(data.challenges[0].id)} style={data.challenges[0].habits.length !== completed.length ? {cursor: 'not-allowed'} : {}}>
                 Completar Dia
             </Button>
         )}
