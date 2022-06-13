@@ -165,7 +165,7 @@ export function HabitosContract({ contractData }) {
           });
         });
       } catch (e) {
-        enqueueSnackbar(e.message, {variant: 'error'});
+        enqueueSnackbar("Ya se cumplio el reto del dia de hoy", {variant: 'error'});
         console.log(e);
       }
     };
@@ -244,7 +244,7 @@ export function HabitosContract({ contractData }) {
                 </Button>
               </>
             );
-            
+
             enqueueSnackbar("Ha cobrado exitosamente su premio", {
               variant,
               action,

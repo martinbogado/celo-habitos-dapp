@@ -21,8 +21,9 @@ const HabitsList = ({ handleChecked, habits, snackbar }) => {
 
   if(loading){
       return(
-          <div>
-              La lista esta cargando..
+          <div className={style.loading}>
+              <span>La lista esta cargando..</span> 
+              <img src="/images/loading2.gif" alt="Loading" />
           </div>
       )
   }
