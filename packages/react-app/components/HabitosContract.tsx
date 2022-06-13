@@ -104,8 +104,6 @@ export function HabitosContract({ contractData }) {
               action,
             });
 
-            console.log(result.events['RetoCreado']?.returnValues.id);
-            
             id = result.events['RetoCreado']?.returnValues.id
           });
         } catch (e) {
@@ -218,6 +216,8 @@ export function HabitosContract({ contractData }) {
     }
 
     const cobrarPremio = async (id) => {
+      let response;
+
       try {
         await performActions(async (kit) => {
           const gasLimit = await contract.methods
@@ -229,12 +229,33 @@ export function HabitosContract({ contractData }) {
             //@ts-ignore
             .send({ from: address, gasLimit });
 
-            console.log(result)
+            response = result.status
+
+            const variant = result.status == true ? "success" : "error";
+           
+            const action: SnackbarAction = (key) => (
+              <>  
+                <Button
+                  onClick={() => {
+                    closeSnackbar(key);
+                  }}
+                >
+                  X
+                </Button>
+              </>
+            );
+            
+            enqueueSnackbar("Ha cobrado exitosamente su premio", {
+              variant,
+              action,
+            });
         });
       } catch (e) {
         enqueueSnackbar(e.message, {variant: 'error'});
         console.log(e);
       }
+
+      return response
     }
 
     const actualizarChallenge = async (id) => {
@@ -303,7 +324,7 @@ export function HabitosContract({ contractData }) {
        
         {data.challenges[0] ? 
             retoFinalizado ? 
-            <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} />
+            <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} exito={data.challenges[0].streak === 3} refetch={refetch} address={address} />
             :
             data.challenges[0].habits?.map( h => {
                 return(
