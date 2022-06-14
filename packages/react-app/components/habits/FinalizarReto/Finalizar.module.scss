@@ -27,3 +27,62 @@
         }
     }
 }
+
+.nft {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 20px;
+
+    background-color: rgb(240, 240, 240);
+    border-radius: 12px;
+    width: 28%;
+    height: 92vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        height: 300px;
+        border-radius: 8px;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 1rem;
+
+        h3 {
+            margin: 0;
+            align-self: center;
+            margin-bottom: 0.5rem;
+        }
+
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            margin: 0.2rem 0;
+
+            strong {
+                margin-left: 0.3rem;
+            }
+        }
+
+        svg {
+            margin-right: 0.4rem;
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    button {
+        margin: 0;
+        margin-top: 1rem;
+    }
+}

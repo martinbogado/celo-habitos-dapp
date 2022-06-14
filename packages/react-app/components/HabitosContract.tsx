@@ -123,6 +123,8 @@ export function HabitosContract({ contractData }) {
       try {
         await performActions(async (kit) => {
 
+          setCompleted([]);
+
           const gasLimit = await contract.methods
             .completarRetoDiario(id)
             .estimateGas();
@@ -132,8 +134,8 @@ export function HabitosContract({ contractData }) {
             //@ts-ignore
             .send({ from: address, gasLimit });
   
-          console.log(result);
-  
+          // console.log(result);
+          
           const variant = result.status == true ? "success" : "error";
 
           if(result.status == true){
@@ -144,7 +146,6 @@ export function HabitosContract({ contractData }) {
             });
 
             refetch();
-            setCompleted([]);
             console.log(response);
           }
           
@@ -245,7 +246,50 @@ export function HabitosContract({ contractData }) {
               </>
             );
 
-            enqueueSnackbar("Ha cobrado exitosamente su premio", {
+            enqueueSnackbar("Ha recuperado exitosamente su dinero", {
+              variant,
+              action,
+            });
+        });
+      } catch (e) {
+        enqueueSnackbar(e.message, {variant: 'error'});
+        console.log(e);
+      }
+
+      return response
+    }
+
+    const reclamarNFT = async (id) => {
+      let response;
+
+      try {
+        await performActions(async (kit) => {
+          const gasLimit = await contract.methods
+            .mint(id)
+            .estimateGas();
+  
+          const result = await contract.methods
+            .mint(id)
+            //@ts-ignore
+            .send({ from: address, gasLimit });
+
+            response = result
+
+            const variant = result.status == true ? "success" : "error";
+           
+            const action: SnackbarAction = (key) => (
+              <>  
+                <Button
+                  onClick={() => {
+                    closeSnackbar(key);
+                  }}
+                >
+                  X
+                </Button>
+              </>
+            );
+
+            enqueueSnackbar("Felicidades por su nuevo NFT!", {
               variant,
               action,
             });
@@ -324,7 +368,7 @@ export function HabitosContract({ contractData }) {
 
         {data.challenges[0] ? 
             retoFinalizado ? 
-            <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} exito={data.challenges[0].streak === 3} refetch={refetch} address={address} />
+            <Finalizar  finalizarReto={finalizarReto} id={data.challenges[0].id} premio={cobrarPremio} exito={data.challenges[0].streak === 3} refetch={refetch} address={address} nft={reclamarNFT}/>
             :
             data.challenges[0].habits?.map( h => {
                 return(
