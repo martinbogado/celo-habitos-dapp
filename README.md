@@ -6,9 +6,19 @@ Este proyecto se construyo para presentar en el Celo Solidity Dev Program.
 
 Es un HabitTracker basado en [Beeminder](https://www.beeminder.com/) pero respaldado por la seguridad y transparencia de los contratos inteligentes.
 
-La idea es generar un incentivo economico propio para que el usuario este mas motivado a adquirir nuevos habitos. El usuario tiene la garantia que si cumple los habitos en tiempo y forma y en consecuencia su reto va a recibir su dinero otra vez.
+La idea es generar un incentivo economico propio para que el usuario este mas motivado a adquirir nuevos habitos. El usuario tiene la garantia que si cumple los habitos en tiempo y forma recibira su dinero otra vez junto con un premio 🎁
 
-## Pagina
+
+# Pagina
+
+## Home
+![image](https://user-images.githubusercontent.com/85038226/173673659-d98ef6c0-3c11-4bf1-ab7e-a34a5682fed2.png)
+
+## Nuevo Reto en Curso
+![image](https://user-images.githubusercontent.com/85038226/173674133-7d86d989-ef84-4d72-9c5d-27e7841ec66f.png)
+
+## Completa tu reto y reclama el premio 🏆
+![image](https://user-images.githubusercontent.com/85038226/173674700-d95bab45-a0e5-4663-89fb-4c2e18e46fdd.png)
 
 <br>
 
