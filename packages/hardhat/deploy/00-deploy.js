@@ -25,6 +25,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
+  await deploy("HABNFT", {
+    from: deployer,
+    log: true,
+  });
+
   await deploy("Storage", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
@@ -61,7 +66,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     LibraryName: **LibraryAddress**
   });
   */
-
 };
 
-module.exports.tags = ["Greeter", "Storage", "Habitos"];
+module.exports.tags = ["Greeter", "Storage", "Habitos", "HABNFT"];

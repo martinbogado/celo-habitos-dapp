@@ -1,6 +1,5 @@
 import * as React from "react";
 import Meta from "../meta/Meta";
-import Footer from "./Footer";
 import { Header } from "./Header";
 
 interface Props {
@@ -15,7 +14,6 @@ export default function AppLayout({ title, description, children }: Props) {
       <Header />
       <Meta title={title} description={description} />
       {children}
-      <Footer />
     </div>
   );
 }

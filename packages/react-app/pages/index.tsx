@@ -3,9 +3,6 @@ import { Tabs, Tab, Typography, Box } from "@mui/material";
 import deployedContracts from "@celo-progressive-dapp-starter/hardhat/deployments/hardhat_contracts.json";
 import { useContractKit } from "@celo-tools/use-contractkit";
 import { 
-  StorageContract, 
-  GreeterContract, 
-  AccountInfo, 
   Polling,
   HabitosContract 
 } from "@/components";
@@ -36,22 +33,10 @@ export default function App() {
       <Box sx={{ width: "100%" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs variant="scrollable" scrollButtons allowScrollButtonsMobile value={value} onChange={handleChange} aria-label="basic tabs">
-            <Tab label="Account" {...a11yProps(0)} />
-            <Tab label="Storage" {...a11yProps(1)} />
-            <Tab label="Greeter" {...a11yProps(2)} />
-            <Tab label="Habitos App" {...a11yProps(3)} />
+            <Tab label="Habitos App" {...a11yProps(0)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
-          <AccountInfo></AccountInfo>
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <StorageContract contractData={contracts?.Storage} />
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-          <GreeterContract contractData={contracts?.Greeter} />
-        </TabPanel>
-        <TabPanel value={value} index={3}>
           <HabitosContract contractData={contracts?.Habitos} />
         </TabPanel>
       </Box>
