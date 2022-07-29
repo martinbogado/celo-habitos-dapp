@@ -1,6 +1,7 @@
 # Celominder - HabitTracker Dapp
 
-Este proyecto se construyo para presentar en el Celo Solidity Dev Program.
+Este proyecto se construyó para presentar en el Celo Solidity Dev Program.
+Fue creado por Martín Bogado y Federico Rascón en junio de 2022.
 
 ## Sobre que trata
 
